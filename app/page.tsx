@@ -1,101 +1,51 @@
-import Image from "next/image";
+// ─── PAGE: Home (/) ────────────────────────────────────────────────────────
+//
+// This is the main screen of Nesci. It shows two things side by side:
+//   LEFT  → a full-screen Google Map with event pins
+//   RIGHT → a scrollable sidebar listing those same events
+//
+// How data flows:
+//   1. The browser asks the user for their location (geolocation API)
+//   2. Both components independently call /api/events?lat=...&lng=...
+//   3. That API route fetches from Ticketmaster and returns a list of events
+//   4. The map drops purple pins; the sidebar lists event cards
+//
+// This file is a SERVER component (no "use client" at the top), which means
+// it renders on the server for fast initial load. The child components
+// (EventMap, EventList) are CLIENT components because they need the browser
+// for geolocation and the Google Maps SDK.
+// ────────────────────────────────────────────────────────────────────────────
+
+import EventMap from "@/components/EventMap";
+import EventList from "@/components/EventList";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    // pt-16 pushes content below the fixed Navbar (which is 4rem / 16 tall)
+    // h-screen + flex make the map fill the entire viewport height
+    <div className="pt-16 h-screen flex flex-col">
+      <div className="flex flex-1 overflow-hidden">
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+        {/* ── Map panel ────────────────────────────────────────────────────
+            flex-1 means it takes all available width after the sidebar.
+            EventMap is a client component that loads the Google Maps SDK. */}
+        <div className="flex-1 relative">
+          <EventMap />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* ── Sidebar ──────────────────────────────────────────────────────
+            Fixed 320px wide, scrolls independently from the map.
+            Shows the same events as map pins, in a readable list format. */}
+        <aside className="w-80 bg-bg-secondary border-l border-[#1f1f2e] overflow-y-auto flex-shrink-0">
+          <div className="p-4 border-b border-[#1f1f2e]">
+            <h2 className="text-sm font-semibold uppercase tracking-widest neon-text-cyan">
+              Nearby Events
+            </h2>
+          </div>
+          <EventList />
+        </aside>
+
+      </div>
     </div>
   );
 }

@@ -9,8 +9,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        "neon-purple": "#a855f7",
+        "neon-cyan": "#06b6d4",
+        "neon-pink": "#ec4899",
+        "bg-primary": "#0a0a0f",
+        "bg-secondary": "#10101a",
+        "bg-card": "#14141f",
+        border: "#1f1f2e",
+      },
+      fontFamily: {
+        sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
+        mono: ["var(--font-geist-mono)", "monospace"],
       },
     },
   },
