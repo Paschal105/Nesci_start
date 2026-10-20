@@ -1,20 +1,19 @@
+// ─── COMPONENT: EventMap ────────────────────────────────────────────────────
+//
+// The map, drawn with MapLibre (free, open-source) using OpenFreeMap's
+// "positron" style — free OpenStreetMap tiles with no API key or card needed.
+// MapLibre only works in the browser, so Discover loads this component with
+// next/dynamic and ssr: false.
+// ────────────────────────────────────────────────────────────────────────────
+
 "use client";
 
-import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-maps/api";
+import { useEffect, useRef } from "react";
+import Map, { Marker, NavigationControl, Popup, type MapRef } from "react-map-gl/maplibre";
+import "maplibre-gl/dist/maplibre-gl.css";
 import { formatEventDate, type Event } from "@/lib/types";
 
-// A soft, warm map: muted colours, no business clutter, so event pins stand out
-const MAP_STYLES = [
-  { elementType: "geometry", stylers: [{ color: "#f7f1ea" }] },
-  { elementType: "labels.text.fill", stylers: [{ color: "#7a6b5d" }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: "#fff8f0" }] },
-  { featureType: "road", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
-  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#fbe3d3" }] },
-  { featureType: "water", elementType: "geometry", stylers: [{ color: "#cfe8e4" }] },
-  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#dcebd5" }] },
-  { featureType: "poi.business", stylers: [{ visibility: "off" }] },
-  { featureType: "transit", elementType: "geometry", stylers: [{ color: "#efe6dc" }] },
-];
+const MAP_STYLE = "https://tiles.openfreemap.org/styles/positron";
 
 interface Props {
   center: { lat: number; lng: number };
@@ -24,46 +23,54 @@ interface Props {
 }
 
 export default function EventMap({ center, events, selected, onSelect }: Props) {
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "",
-  });
+  const mapRef = useRef<MapRef>(null);
 
-  if (!isLoaded) {
-    return (
-      <div className="w-full h-full flex items-center justify-center bg-cream">
-        <span className="text-brand text-sm animate-pulse">Loading map…</span>
-      </div>
-    );
-  }
+  // Glide to a new city when the user searches, or to an event when picked
+  useEffect(() => {
+    const target = selected ?? center;
+    mapRef.current?.flyTo({ center: [target.lng, target.lat], zoom: selected ? 14 : 12 });
+  }, [center, selected]);
 
   return (
-    <GoogleMap
-      mapContainerStyle={{ width: "100%", height: "100%" }}
-      center={selected ? { lat: selected.lat, lng: selected.lng } : center}
-      zoom={12}
-      options={{ styles: MAP_STYLES, disableDefaultUI: true, zoomControl: true }}
+    <Map
+      ref={mapRef}
+      initialViewState={{ longitude: center.lng, latitude: center.lat, zoom: 12 }}
+      style={{ width: "100%", height: "100%" }}
+      mapStyle={MAP_STYLE}
     >
-      {events.map((event) => (
-        <Marker
-          key={event.id}
-          position={{ lat: event.lat, lng: event.lng }}
-          onClick={() => onSelect(event)}
-          icon={{
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: selected?.id === event.id ? 11 : 8,
-            // Restaurants are teal, events are terracotta
-            fillColor: event.source === "google" ? "#0E8A7E" : "#D9532C",
-            fillOpacity: 1,
-            strokeColor: "#ffffff",
-            strokeWeight: 2,
-          }}
-        />
-      ))}
+      <NavigationControl position="top-left" showCompass={false} />
+
+      {events.map((event) => {
+        const isSelected = selected?.id === event.id;
+        return (
+          <Marker
+            key={event.id}
+            longitude={event.lng}
+            latitude={event.lat}
+            onClick={(e) => {
+              // Stop the click reaching the map, which would close the popup
+              e.originalEvent.stopPropagation();
+              onSelect(event);
+            }}
+          >
+            {/* Restaurants are teal, events are terracotta */}
+            <div
+              className={`rounded-full border-2 border-white shadow cursor-pointer transition-transform ${
+                event.source === "osm" ? "bg-accent" : "bg-brand"
+              } ${isSelected ? "w-6 h-6" : "w-4 h-4"}`}
+            />
+          </Marker>
+        );
+      })}
 
       {selected && (
-        <InfoWindow
-          position={{ lat: selected.lat, lng: selected.lng }}
-          onCloseClick={() => onSelect(null)}
+        <Popup
+          longitude={selected.lng}
+          latitude={selected.lat}
+          anchor="bottom"
+          offset={14}
+          onClose={() => onSelect(null)}
+          closeOnClick={false}
         >
           <div className="text-ink max-w-[220px]">
             <p className="font-semibold text-sm">{selected.name}</p>
@@ -72,12 +79,12 @@ export default function EventMap({ center, events, selected, onSelect }: Props) 
             {selected.description && <p className="text-xs text-ink mt-1">{selected.description}</p>}
             {selected.url && (
               <a href={selected.url} target="_blank" rel="noopener noreferrer" className="text-xs text-brand underline mt-1 inline-block">
-                {selected.source === "google" ? "View on Google Maps" : "Get tickets / sign up"}
+                {selected.source === "osm" ? "More info" : "Get tickets / sign up"}
               </a>
             )}
           </div>
-        </InfoWindow>
+        </Popup>
       )}
-    </GoogleMap>
+    </Map>
   );
 }

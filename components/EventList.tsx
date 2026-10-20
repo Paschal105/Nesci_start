@@ -19,7 +19,7 @@ interface Props {
 
 const SOURCE_LABEL: Record<Event["source"], string> = {
   ticketmaster: "Ticketmaster",
-  google: "Google",
+  osm: "OpenStreetMap",
   community: "Community",
 };
 

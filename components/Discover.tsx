@@ -13,13 +13,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import EventMap from "./EventMap";
 import EventList from "./EventList";
 import { useAuth } from "@/lib/useAuth";
 import { ALL_INTEREST_IDS, DEFAULT_LOCATION, INTERESTS, type InterestId } from "@/lib/interests";
 import type { Event } from "@/lib/types";
+
+// The map library needs the browser, so skip it during server rendering
+const EventMap = dynamic(() => import("./EventMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center bg-cream">
+      <span className="text-brand text-sm animate-pulse">Loading map…</span>
+    </div>
+  ),
+});
 
 const WINDOWS = [
   { days: 1, label: "Today" },

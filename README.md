@@ -7,7 +7,7 @@ This README is written specifically for you. It explains every decision that was
 ## What Did We Actually Build?
 
 Nesci is an event discovery app. The home screen shows:
-- A **soft, light map** (Google Maps) covering most of the screen, with terracotta and teal pins for events near you
+- A **soft, light map** (OpenStreetMap, free) covering most of the screen, with terracotta and teal pins for events near you
 - A **sidebar on the right** listing those same events as cards
 - A **navbar** fixed to the top with the Nesci brand
 
@@ -37,7 +37,7 @@ Nesci_start/
 │
 ├── components/                 ← Reusable UI building blocks
 │   ├── Navbar.tsx              ← The top bar with the NESCI logo
-│   ├── EventMap.tsx            ← The Google Map with pins
+│   ├── EventMap.tsx            ← The map with pins (MapLibre + OpenStreetMap)
 │   └── EventList.tsx           ← The sidebar list of event cards
 │
 ├── lib/                        ← Shared logic and utilities (not UI)
@@ -86,7 +86,7 @@ This is the #1 thing that trips people up in Next.js 14.
 - Examples in this project: `EventMap.tsx`, `EventList.tsx`, `Navbar.tsx`
 
 **Why does this matter for Nesci?**
-- The map needs Google Maps, which only works in a browser → Client Component
+- The map library (MapLibre) only works in a browser → Client Component
 - The event list needs `navigator.geolocation` (GPS) → Client Component
 - The home page itself (`page.tsx`) just arranges layout → Server Component is fine
 
@@ -110,14 +110,18 @@ Tailwind is a CSS framework where you style things by adding class names directl
 
 The custom colors (`neon-purple`, `neon-cyan`, `bg-card`, etc.) are defined in `tailwind.config.ts`. Any color you add there becomes available as a Tailwind class.
 
-### Google Maps (`@react-google-maps/api`)
-This is a React wrapper around the Google Maps JavaScript SDK. Instead of manipulating the map with raw JavaScript, you use React components:
+### The Map — MapLibre + OpenStreetMap (free, no key)
+The map is drawn by **MapLibre** (an open-source map library, used through `react-map-gl`) with free map tiles from **OpenFreeMap**, which are built from OpenStreetMap data. No API key, no credit card. Pins and popups are React components:
 ```tsx
-<GoogleMap center={...} zoom={12}>
-  <Marker position={...} />
-</GoogleMap>
+<Map initialViewState={{ latitude, longitude, zoom: 12 }}>
+  <Marker latitude={...} longitude={...} />
+</Map>
 ```
-It needs your Google Maps API key (set in `.env.local`) to work. The map is fully customized with a dark style in `EventMap.tsx` — those are style rules that override Google's default map colors.
+Two other free OpenStreetMap services live in `lib/osm.ts`:
+- **Nominatim** turns a city or address into map coordinates (city search, and the address on "Share an event")
+- **Overpass** finds restaurants near a location. OpenStreetMap has no ratings or prices, so it can't tell which ones are "classy" — users can add upscale spots through "Share an event"
+
+These are community-run services with fair-use rules (identify your app, don't hammer them), so results are cached for a day.
 
 ### Ticketmaster API
 Ticketmaster has a public API called the Discovery API. You send it coordinates and it returns nearby events. The function that does this is in `lib/ticketmaster.ts`. It uses `fetch()` — the same browser/Node built-in you may have used before. The result gets shaped into the `Event` type from `lib/types.ts`.
@@ -166,11 +170,9 @@ EventList renders a card for each event
 
 ## The `.env.local` File — Your Keys
 
-This file holds your secret API keys. It's listed in `.gitignore` so it never gets pushed to GitHub. Copy `.env.example` to `.env.local` and fill in these 5 keys:
+This file holds your secret API keys. It's listed in `.gitignore` so it never gets pushed to GitHub. Copy `.env.example` to `.env.local` and fill in these 3 keys (the map, city search and restaurants are free and need no key):
 
 ```
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=   ← For the map to render
-GOOGLE_PLACES_API_KEY=             ← For restaurants + city search (enable "Places API (New)")
 TICKETMASTER_API_KEY=              ← For concerts, sports and shows
 NEXT_PUBLIC_SUPABASE_URL=          ← Your Supabase project URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY=     ← Your Supabase public key

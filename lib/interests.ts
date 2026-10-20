@@ -7,7 +7,7 @@
 //   - which data sources /api/events calls
 //
 // Where each interest's events come from:
-//   dining      → Google Places (well-rated restaurants)
+//   dining      → OpenStreetMap restaurants + community picks
 //   music       → Ticketmaster, segment "Music"
 //   sports      → Ticketmaster, segment "Sports"
 //   arts        → Ticketmaster, segment "Arts & Theatre"

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { geocodeCity } from "@/lib/places";
+import { geocode } from "@/lib/osm";
 
 // GET /api/geocode?q=Boston, MA → { lat, lng, label }
 export async function GET(req: NextRequest) {
@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Missing q" }, { status: 400 });
   }
 
-  const place = await geocodeCity(q);
+  const place = await geocode(q);
   if (!place) {
     return NextResponse.json({ error: "Place not found" }, { status: 404 });
   }

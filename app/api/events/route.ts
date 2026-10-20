@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchNearbyEvents } from "@/lib/ticketmaster";
-import { fetchClassyRestaurants } from "@/lib/places";
+import { fetchRestaurants } from "@/lib/osm";
 import { fetchCommunityEvents } from "@/lib/community";
 import { ALL_INTEREST_IDS, DEFAULT_LOCATION, isInterestId } from "@/lib/interests";
 
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
   const wantsTicketmaster = ["music", "sports", "arts", "free"].some((i) => interests.has(i as never));
   const [ticketmaster, dining, community] = await Promise.all([
     wantsTicketmaster ? fetchNearbyEvents(lat, lng, days) : [],
-    interests.has("dining") ? fetchClassyRestaurants(lat, lng) : [],
+    interests.has("dining") ? fetchRestaurants(lat, lng) : [],
     fetchCommunityEvents(lat, lng, days),
   ]);
 

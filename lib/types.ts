@@ -12,7 +12,7 @@ export interface Event {
   // Which interest this event belongs to (drives filter chips and pin colour)
   category: InterestId;
   // Where the event came from, so the UI can label it
-  source: "ticketmaster" | "google" | "community";
+  source: "ticketmaster" | "osm" | "community";
   isFree?: boolean;
   description?: string;
 }
