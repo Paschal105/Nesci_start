@@ -29,7 +29,7 @@ export default function EventList({ events, loading, selected, onSelect }: Props
     return (
       <div className="p-4 space-y-3">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-20 bg-bg-card rounded-lg animate-pulse" />
+          <div key={i} className="h-20 bg-sand rounded-lg animate-pulse" />
         ))}
       </div>
     );
@@ -38,7 +38,7 @@ export default function EventList({ events, loading, selected, onSelect }: Props
   // ── Empty state ────────────────────────────────────────────────────────
   if (!events.length) {
     return (
-      <p className="p-4 text-sm text-gray-500">
+      <p className="p-4 text-sm text-muted">
         Nothing matches right now. Try a longer time window or more interests.
       </p>
     );
@@ -46,7 +46,7 @@ export default function EventList({ events, loading, selected, onSelect }: Props
 
   // ── Event cards ────────────────────────────────────────────────────────
   return (
-    <ul className="divide-y divide-border">
+    <ul className="divide-y divide-line">
       {events.map((event) => {
         const interest = INTERESTS.find((i) => i.id === event.category);
         const isSelected = selected?.id === event.id;
@@ -54,16 +54,16 @@ export default function EventList({ events, loading, selected, onSelect }: Props
           <li
             key={event.id}
             onClick={() => onSelect(event)}
-            className={`p-4 hover:bg-bg-card transition-colors cursor-pointer group ${isSelected ? "bg-bg-card" : ""}`}
+            className={`p-4 hover:bg-sand transition-colors cursor-pointer group ${isSelected ? "bg-sand" : ""}`}
           >
-            <p className="text-sm font-medium text-text-primary group-hover:text-neon-cyan transition-colors line-clamp-1">
+            <p className="text-sm font-medium text-ink group-hover:text-accent transition-colors line-clamp-1">
               {interest?.emoji} {event.name}
             </p>
-            <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{event.venue}</p>
+            <p className="text-xs text-muted mt-0.5 line-clamp-1">{event.venue}</p>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-xs text-neon-purple">{event.date}</span>
-              {event.isFree && <span className="text-[10px] rounded bg-neon-cyan/20 text-neon-cyan px-1.5">FREE</span>}
-              <span className="text-[10px] text-gray-600 ml-auto">{SOURCE_LABEL[event.source]}</span>
+              <span className="text-xs text-brand">{event.date}</span>
+              {event.isFree && <span className="text-[10px] rounded bg-accent/15 text-accent px-1.5">FREE</span>}
+              <span className="text-[10px] text-muted ml-auto">{SOURCE_LABEL[event.source]}</span>
             </div>
           </li>
         );

@@ -51,11 +51,11 @@ export default function LoginPage() {
 
   return (
     <div className="pt-28 px-4 flex justify-center">
-      <form onSubmit={handleSubmit} className="w-full max-w-sm glass rounded-xl p-6 space-y-4">
-        <h1 className="text-2xl font-bold neon-text-purple">
+      <form onSubmit={handleSubmit} className="w-full max-w-sm bg-surface border border-line shadow-sm rounded-xl p-6 space-y-4">
+        <h1 className="text-2xl font-bold text-brand">
           {mode === "signup" ? "Join Nesci" : "Welcome back"}
         </h1>
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-muted">
           {mode === "signup"
             ? "Find something to do today, not months from now."
             : "Sign in to see what's happening near you."}
@@ -67,7 +67,7 @@ export default function LoginPage() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-lg bg-bg-card border border-border px-3 py-2 text-sm outline-none focus:border-neon-purple"
+          className="w-full rounded-lg bg-sand border border-line px-3 py-2 text-sm outline-none focus:border-brand"
         />
         <input
           type="password"
@@ -76,15 +76,15 @@ export default function LoginPage() {
           placeholder="Password (6+ characters)"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-lg bg-bg-card border border-border px-3 py-2 text-sm outline-none focus:border-neon-purple"
+          className="w-full rounded-lg bg-sand border border-line px-3 py-2 text-sm outline-none focus:border-brand"
         />
 
-        {message && <p className="text-sm text-neon-pink">{message}</p>}
+        {message && <p className="text-sm text-alert">{message}</p>}
 
         <button
           type="submit"
           disabled={busy}
-          className="w-full rounded-lg bg-neon-purple py-2 text-sm font-semibold text-white neon-glow-purple disabled:opacity-50"
+          className="w-full rounded-lg bg-brand py-2 text-sm font-semibold text-white shadow-md shadow-brand/20 disabled:opacity-50"
         >
           {busy ? "…" : mode === "signup" ? "Create account" : "Sign in"}
         </button>
@@ -92,7 +92,7 @@ export default function LoginPage() {
         <button
           type="button"
           onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
-          className="w-full text-xs text-gray-400 hover:text-neon-cyan"
+          className="w-full text-xs text-muted hover:text-accent"
         >
           {mode === "signup" ? "Already have an account? Sign in" : "New here? Create an account"}
         </button>

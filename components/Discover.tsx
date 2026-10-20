@@ -96,18 +96,18 @@ export default function Discover() {
   return (
     <div className="pt-16 h-screen flex flex-col">
       {/* ── Filter bar ──────────────────────────────────────────────────── */}
-      <div className="border-b border-border bg-bg-secondary px-4 py-3 space-y-2">
+      <div className="border-b border-line bg-surface px-4 py-3 space-y-2">
         <div className="flex flex-wrap items-center gap-2">
           <form onSubmit={searchCity} className="flex gap-2">
             <input
               value={cityQuery}
               onChange={(e) => setCityQuery(e.target.value)}
               placeholder="Search another city…"
-              className="w-48 rounded-lg bg-bg-card border border-border px-3 py-1.5 text-sm outline-none focus:border-neon-purple"
+              className="w-48 rounded-lg bg-sand border border-line px-3 py-1.5 text-sm outline-none focus:border-brand"
             />
           </form>
-          <span className="text-xs text-gray-400">📍 {location.label}</span>
-          {cityError && <span className="text-xs text-neon-pink">{cityError}</span>}
+          <span className="text-xs text-muted">📍 {location.label}</span>
+          {cityError && <span className="text-xs text-alert">{cityError}</span>}
 
           <div className="ml-auto flex gap-1">
             {WINDOWS.map((w) => (
@@ -115,7 +115,7 @@ export default function Discover() {
                 key={w.days}
                 onClick={() => setDays(w.days)}
                 className={`rounded-full px-3 py-1 text-xs ${
-                  days === w.days ? "bg-neon-cyan text-black font-semibold" : "bg-bg-card text-gray-400 hover:text-neon-cyan"
+                  days === w.days ? "bg-accent text-white font-semibold" : "bg-sand text-muted hover:text-accent"
                 }`}
               >
                 {w.label}
@@ -132,7 +132,7 @@ export default function Discover() {
                 key={i.id}
                 onClick={() => toggleInterest(i.id)}
                 className={`rounded-full border px-3 py-1 text-xs transition-colors ${
-                  on ? "border-neon-purple text-text-primary bg-bg-card" : "border-border text-gray-500"
+                  on ? "border-brand text-ink bg-sand" : "border-line text-muted"
                 }`}
               >
                 {i.emoji} {i.label}
@@ -142,8 +142,8 @@ export default function Discover() {
         </div>
 
         {!authLoading && !user && (
-          <p className="text-xs text-gray-400">
-            <Link href="/login" className="text-neon-purple hover:underline">Create an account</Link> to save
+          <p className="text-xs text-muted">
+            <Link href="/login" className="text-brand hover:underline">Create an account</Link> to save
             what you&apos;re into.
           </p>
         )}
@@ -154,9 +154,9 @@ export default function Discover() {
         <div className="flex-1 relative">
           <EventMap center={location} events={events} selected={selected} onSelect={setSelected} />
         </div>
-        <aside className="w-80 bg-bg-secondary border-l border-border overflow-y-auto flex-shrink-0">
-          <div className="p-4 border-b border-border">
-            <h2 className="text-sm font-semibold uppercase tracking-widest neon-text-cyan">
+        <aside className="w-80 bg-surface border-l border-line overflow-y-auto flex-shrink-0">
+          <div className="p-4 border-b border-line">
+            <h2 className="text-sm font-semibold uppercase tracking-widest text-accent">
               {events.length ? `${events.length} things to do` : "Nearby"}
             </h2>
           </div>

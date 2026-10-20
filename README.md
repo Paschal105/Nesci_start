@@ -7,7 +7,7 @@ This README is written specifically for you. It explains every decision that was
 ## What Did We Actually Build?
 
 Nesci is an event discovery app. The home screen shows:
-- A **dark-themed map** (Google Maps) covering most of the screen, with glowing purple pins for events near you
+- A **soft, light map** (Google Maps) covering most of the screen, with terracotta and teal pins for events near you
 - A **sidebar on the right** listing those same events as cards
 - A **navbar** fixed to the top with the Nesci brand
 
@@ -106,7 +106,7 @@ Tailwind is a CSS framework where you style things by adding class names directl
 - `text-sm` = small text
 - `flex` = display flex
 - `p-4` = padding 1rem on all sides
-- `bg-bg-secondary` = background color set to our custom dark color
+- `bg-bg-secondary` = background color set to our custom white surface colour
 
 The custom colors (`neon-purple`, `neon-cyan`, `bg-card`, etc.) are defined in `tailwind.config.ts`. Any color you add there becomes available as a Tailwind class.
 

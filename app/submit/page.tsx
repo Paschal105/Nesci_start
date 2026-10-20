@@ -14,7 +14,7 @@ import { useAuth } from "@/lib/useAuth";
 import { INTERESTS } from "@/lib/interests";
 
 const inputClass =
-  "w-full rounded-lg bg-bg-card border border-border px-3 py-2 text-sm outline-none focus:border-neon-purple";
+  "w-full rounded-lg bg-sand border border-line px-3 py-2 text-sm outline-none focus:border-brand";
 
 export default function SubmitPage() {
   const router = useRouter();
@@ -77,8 +77,8 @@ export default function SubmitPage() {
 
   return (
     <div className="pt-24 px-4 pb-12 max-w-lg mx-auto">
-      <h1 className="text-2xl font-bold neon-text-purple">Share an event</h1>
-      <p className="text-sm text-gray-400 mt-1">
+      <h1 className="text-2xl font-bold text-brand">Share an event</h1>
+      <p className="text-sm text-muted mt-1">
         Know about a meetup, pop-up or hidden gem? Post it for people nearby.
       </p>
 
@@ -96,17 +96,17 @@ export default function SubmitPage() {
         <input required type="datetime-local" value={form.startsAt} onChange={(e) => set("startsAt", e.target.value)} className={inputClass} />
         <input type="url" placeholder="Link to sign up (optional)" value={form.url} onChange={(e) => set("url", e.target.value)} className={inputClass} />
         <textarea placeholder="What should people know? (optional)" rows={3} value={form.description} onChange={(e) => set("description", e.target.value)} className={inputClass} />
-        <label className="flex items-center gap-2 text-sm text-gray-300">
+        <label className="flex items-center gap-2 text-sm text-muted">
           <input type="checkbox" checked={form.isFree} onChange={(e) => set("isFree", e.target.checked)} />
           It&apos;s free
         </label>
 
-        {message && <p className="text-sm text-neon-cyan">{message}</p>}
+        {message && <p className="text-sm text-accent">{message}</p>}
 
         <button
           type="submit"
           disabled={busy}
-          className="w-full rounded-lg bg-neon-purple py-2 font-semibold text-white neon-glow-purple disabled:opacity-50"
+          className="w-full rounded-lg bg-brand py-2 font-semibold text-white shadow-md shadow-brand/20 disabled:opacity-50"
         >
           {busy ? "Submitting…" : "Submit for review"}
         </button>

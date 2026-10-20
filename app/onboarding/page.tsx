@@ -49,8 +49,8 @@ export default function OnboardingPage() {
 
   return (
     <div className="pt-24 px-4 pb-12 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold neon-text-purple">What do you feel like doing?</h1>
-      <p className="text-sm text-gray-400 mt-1">
+      <h1 className="text-2xl font-bold text-brand">What do you feel like doing?</h1>
+      <p className="text-sm text-muted mt-1">
         Pick everything that sounds like you. You can change this any time.
       </p>
 
@@ -62,23 +62,23 @@ export default function OnboardingPage() {
               key={interest.id}
               onClick={() => toggle(interest.id)}
               className={`text-left rounded-xl p-4 border transition-colors ${
-                on ? "border-neon-purple bg-bg-card neon-glow-purple" : "border-border bg-bg-secondary hover:border-neon-cyan"
+                on ? "border-brand bg-sand shadow-md shadow-brand/20" : "border-line bg-surface hover:border-accent"
               }`}
             >
               <span className="text-2xl">{interest.emoji}</span>
               <p className="font-semibold mt-2">{interest.label}</p>
-              <p className="text-xs text-gray-400">{interest.description}</p>
+              <p className="text-xs text-muted">{interest.description}</p>
             </button>
           );
         })}
       </div>
 
-      {error && <p className="text-sm text-neon-pink mt-4">{error}</p>}
+      {error && <p className="text-sm text-alert mt-4">{error}</p>}
 
       <button
         onClick={save}
         disabled={!picked.length || saving}
-        className="mt-6 w-full rounded-lg bg-neon-purple py-3 font-semibold text-white neon-glow-purple disabled:opacity-40"
+        className="mt-6 w-full rounded-lg bg-brand py-3 font-semibold text-white shadow-md shadow-brand/20 disabled:opacity-40"
       >
         {saving ? "Saving…" : "Show me what's happening"}
       </button>
