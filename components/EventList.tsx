@@ -7,7 +7,7 @@
 
 "use client";
 
-import type { Event } from "@/lib/types";
+import { formatEventDate, type Event } from "@/lib/types";
 import { INTERESTS } from "@/lib/interests";
 
 interface Props {
@@ -61,7 +61,7 @@ export default function EventList({ events, loading, selected, onSelect }: Props
             </p>
             <p className="text-xs text-muted mt-0.5 line-clamp-1">{event.venue}</p>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-xs text-brand">{event.date}</span>
+              <span className="text-xs text-brand">{formatEventDate(event.date)}</span>
               {event.isFree && <span className="text-[10px] rounded bg-accent/15 text-accent px-1.5">FREE</span>}
               <span className="text-[10px] text-muted ml-auto">{SOURCE_LABEL[event.source]}</span>
             </div>

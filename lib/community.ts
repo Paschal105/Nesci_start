@@ -42,13 +42,8 @@ export async function fetchCommunityEvents(lat: number, lng: number, days: numbe
         id: `cm-${row.id}`,
         name: row.title,
         venue: row.venue,
-        date: new Date(row.starts_at).toLocaleString("en-US", {
-          weekday: "short",
-          month: "short",
-          day: "numeric",
-          hour: "numeric",
-          minute: "2-digit",
-        }),
+        // Exact time as ISO — the browser formats it in the viewer's time zone
+        date: row.starts_at,
         lat: row.lat,
         lng: row.lng,
         url: row.url ?? undefined,

@@ -17,6 +17,20 @@ export interface Event {
   description?: string;
 }
 
+// Event dates are either a label ("2026-10-24", "Open most days") or, for
+// community events, an exact ISO time. Exact times are shown in the viewer's
+// own time zone, which only the browser knows.
+export function formatEventDate(date: string) {
+  if (!date.includes("T")) return date;
+  return new Date(date).toLocaleString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 // A row in the Supabase "profiles" table (see supabase/schema.sql)
 export interface Profile {
   id: string;
