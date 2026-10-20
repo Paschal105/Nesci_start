@@ -10,6 +10,11 @@ create table if not exists public.profiles (
   created_at timestamptz not null default now()
 );
 
+-- If profiles was created earlier without these columns, add them.
+-- Existing columns (e.g. email, display_name) and any sign-up trigger are left alone.
+alter table public.profiles add column if not exists interests text[] not null default '{}';
+alter table public.profiles add column if not exists home_city text;
+
 alter table public.profiles enable row level security;
 
 drop policy if exists "Users read own profile" on public.profiles;
