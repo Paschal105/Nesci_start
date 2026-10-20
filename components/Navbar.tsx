@@ -1,10 +1,21 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/lib/useAuth";
 
 export default function Navbar() {
+  const router = useRouter();
+  const { user } = useAuth();
+
+  async function signOut() {
+    await supabase.auth.signOut();
+    router.push("/");
+  }
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-[#1f1f2e]">
+    <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-border">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="text-2xl font-bold neon-text-purple tracking-tight">
           NESCI
@@ -13,9 +24,23 @@ export default function Navbar() {
           <Link href="/" className="hover:text-neon-cyan transition-colors">
             Explore
           </Link>
-          <Link href="/events" className="hover:text-neon-cyan transition-colors">
-            Events
-          </Link>
+          {user ? (
+            <>
+              <Link href="/submit" className="hover:text-neon-cyan transition-colors">
+                Share an event
+              </Link>
+              <Link href="/onboarding" className="hover:text-neon-cyan transition-colors">
+                My interests
+              </Link>
+              <button onClick={signOut} className="hover:text-neon-pink transition-colors">
+                Sign out
+              </button>
+            </>
+          ) : (
+            <Link href="/login" className="hover:text-neon-cyan transition-colors">
+              Sign in
+            </Link>
+          )}
         </div>
       </div>
     </nav>

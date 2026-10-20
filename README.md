@@ -166,16 +166,27 @@ EventList renders a card for each event
 
 ## The `.env.local` File — Your Keys
 
-This file holds your secret API keys. It's listed in `.gitignore` so it never gets pushed to GitHub. You have 4 keys to fill in:
+This file holds your secret API keys. It's listed in `.gitignore` so it never gets pushed to GitHub. Copy `.env.example` to `.env.local` and fill in these 5 keys:
 
 ```
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=   ← For the map to render
-TICKETMASTER_API_KEY=              ← For fetching events
+GOOGLE_PLACES_API_KEY=             ← For restaurants + city search (enable "Places API (New)")
+TICKETMASTER_API_KEY=              ← For concerts, sports and shows
 NEXT_PUBLIC_SUPABASE_URL=          ← Your Supabase project URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY=     ← Your Supabase public key
 ```
 
 **Important pattern:** Variables starting with `NEXT_PUBLIC_` are sent to the browser. Variables without that prefix stay server-side only. Your Ticketmaster key has NO `NEXT_PUBLIC_` prefix on purpose — it only runs on the server (in `lib/ticketmaster.ts`), so it never gets exposed in the browser's source code.
+
+---
+
+## Setting Up the Database (once)
+
+Open your Supabase project → **SQL Editor**, paste in all of `supabase/schema.sql`, and click **Run**. That creates:
+- `profiles` — each user's quiz answers (their interests)
+- `community_events` — events people submit at `/submit`
+
+Submitted events stay hidden until you approve them: in Supabase → **Table Editor** → `community_events`, set `approved` to `true`.
 
 ---
 
@@ -193,14 +204,19 @@ Then open `http://localhost:3000` in your browser. Every time you save a file, t
 
 ---
 
+## What's Built
+
+- **Sign up / sign in** (`/login`) with Supabase email + password
+- **Taste quiz** (`/onboarding`) — classy dining, networking, underground, free, music, sports, arts
+- **Personal home feed** — filtered by your interests, limited to today / this week / next 3 weeks, defaulting to Worcester, MA
+- **City search** — look at another city's options
+- **Share an event** (`/submit`) — how networking and underground events get in, with approval
+
 ## What's Not Built Yet
 
-This is a foundation. Here's what comes next:
-- An `/events` page that shows all events in a grid layout
-- Clicking a map pin → opening an event detail panel
-- Filtering events by category (music, sports, arts)
-- Saving favorites to Supabase
-- A search bar to look up events by city
+- More data sources for networking events (e.g. Meetup, Luma)
+- Saving favorites
+- A phone app version
 
 ---
 

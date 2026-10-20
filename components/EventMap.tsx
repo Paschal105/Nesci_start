@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-maps/api";
 import type { Event } from "@/lib/types";
 
@@ -17,29 +16,17 @@ const MAP_STYLES = [
   { featureType: "administrative", elementType: "geometry", stylers: [{ color: "#1f1f2e" }] },
 ];
 
-const DEFAULT_CENTER = { lat: 40.7128, lng: -74.006 }; // NYC fallback
+interface Props {
+  center: { lat: number; lng: number };
+  events: Event[];
+  selected: Event | null;
+  onSelect: (event: Event | null) => void;
+}
 
-export default function EventMap() {
+export default function EventMap({ center, events, selected, onSelect }: Props) {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "",
   });
-
-  const [events, setEvents] = useState<Event[]>([]);
-  const [selected, setSelected] = useState<Event | null>(null);
-  const [center, setCenter] = useState(DEFAULT_CENTER);
-
-  useEffect(() => {
-    navigator.geolocation?.getCurrentPosition((pos) => {
-      setCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-    });
-  }, []);
-
-  useEffect(() => {
-    fetch(`/api/events?lat=${center.lat}&lng=${center.lng}`)
-      .then((r) => r.json())
-      .then((data) => setEvents(data.events ?? []))
-      .catch(() => {});
-  }, [center]);
 
   if (!isLoaded) {
     return (
@@ -52,7 +39,7 @@ export default function EventMap() {
   return (
     <GoogleMap
       mapContainerStyle={{ width: "100%", height: "100%" }}
-      center={center}
+      center={selected ? { lat: selected.lat, lng: selected.lng } : center}
       zoom={12}
       options={{ styles: MAP_STYLES, disableDefaultUI: true, zoomControl: true }}
     >
@@ -60,13 +47,14 @@ export default function EventMap() {
         <Marker
           key={event.id}
           position={{ lat: event.lat, lng: event.lng }}
-          onClick={() => setSelected(event)}
+          onClick={() => onSelect(event)}
           icon={{
             path: google.maps.SymbolPath.CIRCLE,
-            scale: 8,
-            fillColor: "#a855f7",
+            scale: selected?.id === event.id ? 11 : 8,
+            // Restaurants are cyan, events are purple
+            fillColor: event.source === "google" ? "#06b6d4" : "#a855f7",
             fillOpacity: 1,
-            strokeColor: "#06b6d4",
+            strokeColor: event.source === "google" ? "#a855f7" : "#06b6d4",
             strokeWeight: 2,
           }}
         />
@@ -75,12 +63,18 @@ export default function EventMap() {
       {selected && (
         <InfoWindow
           position={{ lat: selected.lat, lng: selected.lng }}
-          onCloseClick={() => setSelected(null)}
+          onCloseClick={() => onSelect(null)}
         >
-          <div className="text-black max-w-[200px]">
+          <div className="text-black max-w-[220px]">
             <p className="font-semibold text-sm">{selected.name}</p>
             <p className="text-xs text-gray-600 mt-1">{selected.venue}</p>
             <p className="text-xs text-gray-500">{selected.date}</p>
+            {selected.description && <p className="text-xs text-gray-700 mt-1">{selected.description}</p>}
+            {selected.url && (
+              <a href={selected.url} target="_blank" rel="noopener noreferrer" className="text-xs text-purple-600 underline mt-1 inline-block">
+                {selected.source === "google" ? "View on Google Maps" : "Get tickets / sign up"}
+              </a>
+            )}
           </div>
         </InfoWindow>
       )}

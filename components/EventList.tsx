@@ -1,52 +1,29 @@
 // ─── COMPONENT: EventList ───────────────────────────────────────────────────
 //
-// Renders a scrollable list of events in the right-hand sidebar.
-//
-// What it does:
-//   1. On mount, asks the browser for the user's GPS location
-//   2. Calls /api/events?lat=...&lng=... with those coordinates
-//   3. Displays a skeleton loader while waiting
-//   4. Renders one card per event once data arrives
-//
-// NOTE: This component duplicates the fetch that EventMap also makes.
-// In a future iteration we'd lift this state up to the Home page and pass
-// events down as props — but keeping them independent makes each component
-// simpler to understand right now.
-//
-// "use client" is required here because:
-//   - navigator.geolocation only exists in the browser, not on the server
-//   - useState / useEffect are React client-side hooks
+// The sidebar list of events. It no longer fetches anything itself — the
+// parent (Discover) passes the events in, so the list and the map always
+// show the same data. Clicking a card selects that event on the map.
 // ────────────────────────────────────────────────────────────────────────────
 
 "use client";
 
-import { useEffect, useState } from "react";
 import type { Event } from "@/lib/types";
+import { INTERESTS } from "@/lib/interests";
 
-export default function EventList() {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
+interface Props {
+  events: Event[];
+  loading: boolean;
+  selected: Event | null;
+  onSelect: (event: Event) => void;
+}
 
-  useEffect(() => {
-    // Try to get the user's real location first.
-    // If they deny permission, fall back to NYC as a default.
-    navigator.geolocation?.getCurrentPosition(
-      (pos) => {
-        fetch(`/api/events?lat=${pos.coords.latitude}&lng=${pos.coords.longitude}`)
-          .then((r) => r.json())
-          .then((data) => setEvents(data.events ?? []))
-          .finally(() => setLoading(false));
-      },
-      () => {
-        // Geolocation denied or unavailable — use NYC as fallback
-        fetch("/api/events?lat=40.7128&lng=-74.006")
-          .then((r) => r.json())
-          .then((data) => setEvents(data.events ?? []))
-          .finally(() => setLoading(false));
-      }
-    );
-  }, []); // Empty array = run once when the component first appears on screen
+const SOURCE_LABEL: Record<Event["source"], string> = {
+  ticketmaster: "Ticketmaster",
+  google: "Google",
+  community: "Community",
+};
 
+export default function EventList({ events, loading, selected, onSelect }: Props) {
   // ── Loading state: animated placeholder cards ──────────────────────────
   if (loading) {
     return (
@@ -61,30 +38,36 @@ export default function EventList() {
   // ── Empty state ────────────────────────────────────────────────────────
   if (!events.length) {
     return (
-      <p className="p-4 text-sm text-gray-500">No events found nearby.</p>
+      <p className="p-4 text-sm text-gray-500">
+        Nothing matches right now. Try a longer time window or more interests.
+      </p>
     );
   }
 
   // ── Event cards ────────────────────────────────────────────────────────
   return (
-    <ul className="divide-y divide-[#1f1f2e]">
-      {events.map((event) => (
-        <li
-          key={event.id}
-          className="p-4 hover:bg-bg-card transition-colors cursor-pointer group"
-        >
-          {/* Event name — truncated to one line with ellipsis if too long */}
-          <p className="text-sm font-medium text-text-primary group-hover:text-neon-cyan transition-colors line-clamp-1">
-            {event.name}
-          </p>
-
-          {/* Venue name */}
-          <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{event.venue}</p>
-
-          {/* Date — shown in neon purple to stand out */}
-          <p className="text-xs text-neon-purple mt-1">{event.date}</p>
-        </li>
-      ))}
+    <ul className="divide-y divide-border">
+      {events.map((event) => {
+        const interest = INTERESTS.find((i) => i.id === event.category);
+        const isSelected = selected?.id === event.id;
+        return (
+          <li
+            key={event.id}
+            onClick={() => onSelect(event)}
+            className={`p-4 hover:bg-bg-card transition-colors cursor-pointer group ${isSelected ? "bg-bg-card" : ""}`}
+          >
+            <p className="text-sm font-medium text-text-primary group-hover:text-neon-cyan transition-colors line-clamp-1">
+              {interest?.emoji} {event.name}
+            </p>
+            <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{event.venue}</p>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-xs text-neon-purple">{event.date}</span>
+              {event.isFree && <span className="text-[10px] rounded bg-neon-cyan/20 text-neon-cyan px-1.5">FREE</span>}
+              <span className="text-[10px] text-gray-600 ml-auto">{SOURCE_LABEL[event.source]}</span>
+            </div>
+          </li>
+        );
+      })}
     </ul>
   );
 }

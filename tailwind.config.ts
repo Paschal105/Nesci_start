@@ -16,6 +16,7 @@ const config: Config = {
         "bg-secondary": "#10101a",
         "bg-card": "#14141f",
         border: "#1f1f2e",
+        "text-primary": "#f0f0ff",
       },
       fontFamily: {
         sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
