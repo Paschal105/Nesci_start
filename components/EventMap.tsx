@@ -11,7 +11,7 @@
 import { useEffect, useRef } from "react";
 import Map, { Marker, NavigationControl, Popup, type MapRef } from "react-map-gl/maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { formatEventDate, type Event } from "@/lib/types";
+import { eventWhen, type Event } from "@/lib/types";
 
 const MAP_STYLE = "https://tiles.openfreemap.org/styles/positron";
 
@@ -75,7 +75,7 @@ export default function EventMap({ center, events, selected, onSelect }: Props) 
           <div className="text-ink max-w-[220px]">
             <p className="font-semibold text-sm">{selected.name}</p>
             <p className="text-xs text-muted mt-1">{selected.venue}</p>
-            <p className="text-xs text-muted">{formatEventDate(selected.date)}</p>
+            <p className="text-xs text-muted">{eventWhen(selected)}</p>
             {selected.description && <p className="text-xs text-ink mt-1">{selected.description}</p>}
             {selected.url && (
               <a href={selected.url} target="_blank" rel="noopener noreferrer" className="text-xs text-brand underline mt-1 inline-block">

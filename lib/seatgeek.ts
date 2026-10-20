@@ -17,6 +17,7 @@ interface SeatGeekEvent {
   datetime_utc: string; // UTC without the trailing "Z"
   datetime_local: string;
   time_tbd: boolean;
+  date_tbd?: boolean;
   type: string;
   taxonomies?: { name: string }[];
   venue?: { name: string; location?: { lat: number; lon: number } };
@@ -70,7 +71,7 @@ export async function fetchSeatGeekEvents(lat: number, lng: number, days: number
           name: e.title,
           venue: e.venue?.name ?? "Unknown venue",
           // Exact time (shown in the viewer's time zone), or just the day if the time isn't set yet
-          date: e.time_tbd ? e.datetime_local.slice(0, 10) : `${e.datetime_utc}Z`,
+          date: e.date_tbd ? null : e.time_tbd ? e.datetime_local.slice(0, 10) : `${e.datetime_utc}Z`,
           lat: loc.lat,
           lng: loc.lon,
           url: e.url,

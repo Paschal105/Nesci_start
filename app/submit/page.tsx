@@ -60,7 +60,7 @@ export default function SubmitPage() {
       venue: form.venue,
       lat,
       lng,
-      starts_at: new Date(form.startsAt).toISOString(),
+      starts_at: form.startsAt ? new Date(form.startsAt).toISOString() : null,
       is_free: form.isFree,
       url: form.url || null,
       description: form.description || null,
@@ -93,7 +93,10 @@ export default function SubmitPage() {
         </select>
         <input required placeholder="Venue name" value={form.venue} onChange={(e) => set("venue", e.target.value)} className={inputClass} />
         <input required placeholder="Address (e.g. 1 Main St, Worcester, MA)" value={form.address} onChange={(e) => set("address", e.target.value)} className={inputClass} />
-        <input required type="datetime-local" value={form.startsAt} onChange={(e) => set("startsAt", e.target.value)} className={inputClass} />
+        <label className="block text-xs text-muted">
+          Date and time — leave empty if it&apos;s not announced yet
+          <input type="datetime-local" value={form.startsAt} onChange={(e) => set("startsAt", e.target.value)} className={`${inputClass} mt-1`} />
+        </label>
         <input type="url" placeholder="Link to sign up (optional)" value={form.url} onChange={(e) => set("url", e.target.value)} className={inputClass} />
         <textarea placeholder="What should people know? (optional)" rows={3} value={form.description} onChange={(e) => set("description", e.target.value)} className={inputClass} />
         <label className="flex items-center gap-2 text-sm text-muted">

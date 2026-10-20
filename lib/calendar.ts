@@ -17,7 +17,7 @@ const NEARBY_KM = 40; // ~25 miles, same as the ticketing sources
 export interface CalendarEntry {
   uid: string;
   title: string;
-  start: Date;
+  start: Date | null; // null when the calendar gives no date — still shown, as "Date not announced"
   allDay: boolean;
   location?: string;
   description?: string;
@@ -118,15 +118,15 @@ export function parseIcs(text: string): CalendarEntry[] {
       continue;
     }
     if (line === "END:VEVENT" && current) {
-      const start = current.DTSTART && parseIcsDate(current.DTSTART.value, current.DTSTART.params);
+      const start = current.DTSTART ? parseIcsDate(current.DTSTART.value, current.DTSTART.params) : null;
       const title = current.SUMMARY && unescapeText(current.SUMMARY.value);
-      if (start && title && current.STATUS?.value !== "CANCELLED") {
+      if (title && current.STATUS?.value !== "CANCELLED") {
         const geo = current.GEO?.value.split(/[;,]/).map(Number);
         entries.push({
-          uid: current.UID?.value ?? `${title}-${start.date.toISOString()}`,
+          uid: current.UID?.value ?? `${title}-${start?.date.toISOString() ?? "undated"}`,
           title,
-          start: start.date,
-          allDay: start.allDay,
+          start: start?.date ?? null,
+          allDay: start?.allDay ?? false,
           location: current.LOCATION && unescapeText(current.LOCATION.value),
           description: current.DESCRIPTION && unescapeText(current.DESCRIPTION.value).slice(0, 300),
           url: current.URL?.value,
@@ -166,15 +166,16 @@ interface LocalistEvent {
 }
 
 export function parseLocalist(data: { events?: { event: LocalistEvent }[] }): CalendarEntry[] {
-  return (data.events ?? []).flatMap(({ event }) =>
-    (event.event_instances ?? []).map(({ event_instance }) => {
+  return (data.events ?? []).flatMap(({ event }) => {
+    const instances = event.event_instances?.length ? event.event_instances.map((i) => i.event_instance) : [null];
+    return instances.map((instance) => {
       const lat = Number(event.geo?.latitude);
       const lng = Number(event.geo?.longitude);
       return {
-        uid: `${event.id}-${event_instance.id}`,
+        uid: `${event.id}-${instance?.id ?? "undated"}`,
         title: event.title,
-        start: new Date(event_instance.start),
-        allDay: !!event_instance.all_day,
+        start: instance ? new Date(instance.start) : null,
+        allDay: !!instance?.all_day,
         location: event.location_name,
         description: event.description_text?.slice(0, 300),
         url: event.localist_url ?? event.url ?? undefined,
@@ -183,8 +184,8 @@ export function parseLocalist(data: { events?: { event: LocalistEvent }[] }): Ca
         isFree: event.free,
         tags: event.filters?.event_types?.map((t) => t.name),
       };
-    })
-  );
+    });
+  });
 }
 
 // ── Fetching ───────────────────────────────────────────────────────────────
@@ -214,16 +215,19 @@ export async function fetchCalendarEvents(lat: number, lng: number, days: number
       try {
         const entries = await fetchFeedEntries(feed, days);
         return entries
-          .filter((e) => e.start.getTime() >= now - (e.allDay ? 86400000 : 0) && e.start.getTime() <= end)
+          // Undated entries are kept; dated ones must fall inside the time window
+          .filter((e) => !e.start || (e.start.getTime() >= now - (e.allDay ? 86400000 : 0) && e.start.getTime() <= end))
           .map(
             (e): Event => ({
               id: `cal-${feed.name}-${e.uid}`,
               name: e.title,
               venue: e.location || feed.name,
               // All-day events show just the day; timed events show in the viewer's time zone
-              date: e.allDay
-                ? e.start.toLocaleDateString("en-CA", { timeZone: DEFAULT_TZ })
-                : e.start.toISOString(),
+              date: !e.start
+                ? null
+                : e.allDay
+                  ? e.start.toLocaleDateString("en-CA", { timeZone: DEFAULT_TZ })
+                  : e.start.toISOString(),
               lat: e.lat ?? feed.location.lat,
               lng: e.lng ?? feed.location.lng,
               url: e.url,

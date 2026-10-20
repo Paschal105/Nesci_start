@@ -32,16 +32,19 @@ async function main() {
     if (!entries) continue;
 
     const upcoming = entries
-      .filter((e) => e.start.getTime() >= Date.now() - 86400000)
-      .sort((a, b) => a.start.getTime() - b.start.getTime());
+      .filter((e) => !e.start || e.start.getTime() >= Date.now() - 86400000)
+      .sort((a, b) => (a.start?.getTime() ?? Infinity) - (b.start?.getTime() ?? Infinity));
+    const undated = entries.filter((e) => !e.start).length;
     const withCoords = entries.filter((e) => e.lat !== undefined).length;
 
     console.log(`\n✅ Nesci can read this calendar.`);
     console.log(`   kind: "${kind}"`);
-    console.log(`   ${entries.length} events found, ${upcoming.length} upcoming`);
+    console.log(`   ${entries.length} events found, ${upcoming.length} upcoming (${undated} with no date — still shown in Nesci)`);
     console.log(`   ${withCoords} have their own map location (the rest will use the "location" you set)\n`);
     for (const e of upcoming.slice(0, 8)) {
-      const when = e.start.toLocaleString("en-US", { timeZone: "America/New_York", dateStyle: "medium", timeStyle: "short" });
+      const when = e.start
+        ? e.start.toLocaleString("en-US", { timeZone: "America/New_York", dateStyle: "medium", timeStyle: "short" })
+        : "Date not announced";
       const category = guessCategory([e.title, ...(e.tags ?? [])].join(" "), "arts");
       console.log(`   • ${when}  ${e.title}${e.isFree ? "  [FREE]" : ""}  (looks like: ${category})`);
     }

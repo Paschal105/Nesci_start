@@ -197,6 +197,10 @@ Nesci combines several sources into one feed (`app/api/events/route.ts`), so it 
 
 The same show listed on both Ticketmaster and SeatGeek is only shown once.
 
+**Events without a date are kept, not thrown away.** If a source doesn't give a date (or it hasn't been announced), the event's `date` is `null`. It still shows in every time window, sorted after the dated events, labelled "Date not announced". Use `eventWhen(event)` from `lib/types.ts` to display an event's date — it handles this case.
+
+**One broken source never empties the feed.** Each source is wrapped in `safely()` in the events route: if it errors or takes more than 10 seconds, it's skipped and the others still show.
+
 ### Adding a calendar
 1. Find the calendar link on the organisation's events page — look for **iCal**, **.ics**, **Subscribe** or **Add to calendar**. For college calendars run on Localist, the calendar's main address works.
 2. Test it: `npm run check-feed <link>` — it tells you whether Nesci can read it, which `kind` it is, and shows the next few events.
@@ -211,6 +215,8 @@ Calendars only appear for people browsing within ~25 miles of the calendar's `lo
 Open your Supabase project → **SQL Editor**, paste in all of `supabase/schema.sql`, and click **Run**. That creates:
 - `profiles` — each user's quiz answers (their interests)
 - `community_events` — events people submit at `/submit`
+
+Run this file again whenever it changes — it's safe to re-run and upgrades older databases (for example, it makes the event date optional).
 
 Submitted events stay hidden until you approve them: in Supabase → **Table Editor** → `community_events`, set `approved` to `true`.
 

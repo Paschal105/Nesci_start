@@ -22,13 +22,13 @@ export async function fetchCommunityEvents(lat: number, lng: number, days: numbe
     .from("community_events")
     .select("*")
     .eq("approved", true)
-    .gte("starts_at", now.toISOString())
-    .lte("starts_at", end.toISOString())
+    // Events with no date are kept; dated ones must fall inside the time window
+    .or(`starts_at.is.null,and(starts_at.gte."${now.toISOString()}",starts_at.lte."${end.toISOString()}")`)
     .gte("lat", lat - DEGREES_AROUND)
     .lte("lat", lat + DEGREES_AROUND)
     .gte("lng", lng - DEGREES_AROUND)
     .lte("lng", lng + DEGREES_AROUND)
-    .order("starts_at");
+    .order("starts_at", { nullsFirst: false });
 
   if (error) {
     console.error("Community events query failed:", error.message);
@@ -42,8 +42,8 @@ export async function fetchCommunityEvents(lat: number, lng: number, days: numbe
         id: `cm-${row.id}`,
         name: row.title,
         venue: row.venue,
-        // Exact time as ISO — the browser formats it in the viewer's time zone
-        date: row.starts_at,
+        // Exact time as ISO (the browser formats it in the viewer's time zone), or null if not given
+        date: row.starts_at ?? null,
         lat: row.lat,
         lng: row.lng,
         url: row.url ?? undefined,

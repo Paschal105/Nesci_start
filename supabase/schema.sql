@@ -36,13 +36,16 @@ create table if not exists public.community_events (
   venue text not null,
   lat double precision not null,
   lng double precision not null,
-  starts_at timestamptz not null,
+  starts_at timestamptz, -- empty when the date isn't known yet
   is_free boolean not null default false,
   url text,
   submitted_by uuid references auth.users (id) on delete set null default auth.uid(),
   approved boolean not null default false,
   created_at timestamptz not null default now()
 );
+
+-- For databases created before dates became optional
+alter table public.community_events alter column starts_at drop not null;
 
 alter table public.community_events enable row level security;
 

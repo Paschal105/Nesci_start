@@ -57,7 +57,7 @@ export async function fetchNearbyEvents(
       id: `tm-${item.id}`,
       name: item.name,
       venue: venue?.name ?? "Unknown venue",
-      date: item.dates?.start?.localDate ?? "TBD",
+      date: item.dates?.start?.localDate ?? null,
       lat: venueLat,
       lng: venueLng,
       url: item.url,
