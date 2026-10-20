@@ -18,7 +18,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import EventList from "./EventList";
 import { useAuth } from "@/lib/useAuth";
-import { ALL_INTEREST_IDS, DEFAULT_LOCATION, INTERESTS, type InterestId } from "@/lib/interests";
+import { ALL_INTEREST_IDS, CITIES, DEFAULT_LOCATION, INTERESTS, type InterestId } from "@/lib/interests";
 import type { Event } from "@/lib/types";
 
 // The map library needs the browser, so skip it during server rendering
@@ -116,6 +116,20 @@ export default function Discover() {
               className="w-48 rounded-lg bg-sand border border-line px-3 py-1.5 text-sm outline-none focus:border-brand"
             />
           </form>
+          {CITIES.map((city) => (
+            <button
+              key={city.label}
+              onClick={() => {
+                setLocation(city);
+                setSelected(null);
+              }}
+              className={`rounded-full px-3 py-1 text-xs ${
+                location.label === city.label ? "bg-brand text-white font-semibold" : "bg-sand text-muted hover:text-brand"
+              }`}
+            >
+              {city.label.split(",")[0]}
+            </button>
+          ))}
           <span className="text-xs text-muted">📍 {location.label}</span>
           {cityError && <span className="text-xs text-alert">{cityError}</span>}
 

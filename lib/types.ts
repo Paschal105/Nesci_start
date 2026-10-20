@@ -12,7 +12,9 @@ export interface Event {
   // Which interest this event belongs to (drives filter chips and pin colour)
   category: InterestId;
   // Where the event came from, so the UI can label it
-  source: "ticketmaster" | "osm" | "community";
+  source: "ticketmaster" | "seatgeek" | "osm" | "calendar" | "community";
+  // For calendar events: which calendar it came from (e.g. "WPI")
+  sourceName?: string;
   isFree?: boolean;
   description?: string;
 }

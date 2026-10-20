@@ -8,10 +8,10 @@
 //
 // Where each interest's events come from:
 //   dining      → OpenStreetMap restaurants + community picks
-//   music       → Ticketmaster, segment "Music"
-//   sports      → Ticketmaster, segment "Sports"
-//   arts        → Ticketmaster, segment "Arts & Theatre"
-//   networking  → community submissions (no good public API exists)
+//   music       → Ticketmaster + SeatGeek + calendars
+//   sports      → Ticketmaster + SeatGeek + calendars
+//   arts        → Ticketmaster + SeatGeek + calendars
+//   networking  → calendars (colleges etc.) + community submissions
 //   underground → community submissions (by definition, not on big sites)
 //   free        → any source where the event is marked free
 // ────────────────────────────────────────────────────────────────────────────
@@ -43,3 +43,10 @@ export const TICKETMASTER_SEGMENTS: Partial<Record<InterestId, string>> = {
 
 // Worcester, MA — the launch city and the fallback when location is denied.
 export const DEFAULT_LOCATION = { lat: 42.2626, lng: -71.8023, label: "Worcester, MA" };
+
+// One-tap city buttons on the home page
+export const CITIES = [
+  DEFAULT_LOCATION,
+  { lat: 42.3601, lng: -71.0589, label: "Boston, MA" },
+  { lat: 40.7128, lng: -74.006, label: "New York, NY" },
+];

@@ -174,11 +174,35 @@ This file holds your secret API keys. It's listed in `.gitignore` so it never ge
 
 ```
 TICKETMASTER_API_KEY=              ← For concerts, sports and shows
+SEATGEEK_CLIENT_ID=                ← Optional: more concerts, sports, comedy
 NEXT_PUBLIC_SUPABASE_URL=          ← Your Supabase project URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY=     ← Your Supabase public key
 ```
 
 **Important pattern:** Variables starting with `NEXT_PUBLIC_` are sent to the browser. Variables without that prefix stay server-side only. Your Ticketmaster key has NO `NEXT_PUBLIC_` prefix on purpose — it only runs on the server (in `lib/ticketmaster.ts`), so it never gets exposed in the browser's source code.
+
+---
+
+## Where Events Come From
+
+Nesci combines several sources into one feed (`app/api/events/route.ts`), so it never depends on Ticketmaster alone:
+
+| Source | File | What it adds | Key needed? |
+|---|---|---|---|
+| Ticketmaster | `lib/ticketmaster.ts` | Concerts, sports, theatre | `TICKETMASTER_API_KEY` |
+| SeatGeek | `lib/seatgeek.ts` | More concerts, sports, comedy | Optional: `SEATGEEK_CLIENT_ID` (skipped if empty) |
+| Calendars | `lib/feeds.ts` + `lib/calendar.ts` | College, library, museum, venue and community calendars — free talks, career fairs, networking, arts | No |
+| OpenStreetMap | `lib/osm.ts` | Restaurants | No |
+| Community | `lib/community.ts` | Events people post at `/submit` | No (uses Supabase) |
+
+The same show listed on both Ticketmaster and SeatGeek is only shown once.
+
+### Adding a calendar
+1. Find the calendar link on the organisation's events page — look for **iCal**, **.ics**, **Subscribe** or **Add to calendar**. For college calendars run on Localist, the calendar's main address works.
+2. Test it: `npm run check-feed <link>` — it tells you whether Nesci can read it, which `kind` it is, and shows the next few events.
+3. Add an entry to the `FEEDS` list in `lib/feeds.ts` (instructions are at the top of that file).
+
+Calendars only appear for people browsing within ~25 miles of the calendar's `location`, so Boston calendars show up in Boston, NYC ones in New York.
 
 ---
 

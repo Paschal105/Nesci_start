@@ -19,6 +19,8 @@ interface Props {
 
 const SOURCE_LABEL: Record<Event["source"], string> = {
   ticketmaster: "Ticketmaster",
+  seatgeek: "SeatGeek",
+  calendar: "Calendar",
   osm: "OpenStreetMap",
   community: "Community",
 };
@@ -63,7 +65,7 @@ export default function EventList({ events, loading, selected, onSelect }: Props
             <div className="flex items-center gap-2 mt-1">
               <span className="text-xs text-brand">{formatEventDate(event.date)}</span>
               {event.isFree && <span className="text-[10px] rounded bg-accent/15 text-accent px-1.5">FREE</span>}
-              <span className="text-[10px] text-muted ml-auto">{SOURCE_LABEL[event.source]}</span>
+              <span className="text-[10px] text-muted ml-auto">{event.sourceName ?? SOURCE_LABEL[event.source]}</span>
             </div>
           </li>
         );
